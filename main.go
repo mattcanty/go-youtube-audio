@@ -7,6 +7,7 @@ import (
 	"log"
 	"net/http"
 	"net/url"
+	"os"
 	"strings"
 	"text/template"
 
@@ -84,6 +85,6 @@ func main() {
 
 		err = t.ExecuteTemplate(w, "T", selectedFormat.URL)
 	})
-	http.ListenAndServe(":3000", r)
+	http.ListenAndServe(os.Getenv("PORT"), r)
 
 }
