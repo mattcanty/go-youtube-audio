@@ -17,6 +17,11 @@ import (
 
 type PlayerResponse struct {
 	StreamingData StreamingData `json:"streamingData"`
+	VideoDetails  VideoDetails  `json:"videoDetails"`
+}
+
+type VideoDetails struct {
+	Title string `json:"title"`
 }
 
 type StreamingData struct {
@@ -77,11 +82,14 @@ func main() {
 			}
 		}
 
-		fmt.Println(selectedFormat.URL)
+		t, err := template.New("foo").Parse(`{{define "T"}}<h2>{{.Title}}</h2><br /><audio width="100%" src="{{.URL}}" controls></audio>{{end}}`)
 
-		t, err := template.New("foo").Parse(`{{define "T"}}<audio src="{{.}}" controls></audio>{{end}}`)
-
-		err = t.ExecuteTemplate(w, "T", selectedFormat.URL)
+		err = t.ExecuteTemplate(w, "T", struct {
+			Title, URL string
+		}{
+			Title: playerResponse.VideoDetails.Title,
+			URL:   selectedFormat.URL,
+		})
 	})
 
 	http.ListenAndServe(fmt.Sprintf(":%s", os.Getenv("PORT")), r)
