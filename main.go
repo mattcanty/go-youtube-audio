@@ -108,21 +108,24 @@ func main() {
 	})
 
 	r.Get("/mp3/{videoURL}", func(w http.ResponseWriter, r *http.Request) {
+		log.Print(1)
 		url, err := url.QueryUnescape(chi.URLParam(r, "videoURL"))
 		if err != nil {
 			log.Fatal(err)
 		}
+		log.Print(2)
 		urlHash := fnv.New32a()
 		urlHash.Write([]byte(url))
-
+		log.Print(3)
 		inputFilePath := fmt.Sprintf("/tmp/%d.webm", urlHash.Sum32())
 		outputFilePath := fmt.Sprintf("/tmp/%d.mp3", urlHash.Sum32())
-
-		fmt.Printf("Downloading %s...\n", url)
+		log.Print(4)
+		log.Printf("Downloading %s...\n", url)
 		_, err = grab.Get(inputFilePath, url)
 		if err != nil {
 			log.Fatal(err)
 		}
+		log.Print(5)
 
 		format := "mp3"
 		overwrite := true
@@ -143,15 +146,17 @@ func main() {
 			Output(outputFilePath).
 			WithOptions(opts).
 			Start(opts)
-
+		log.Print(6)
 		if err != nil {
 			log.Fatal(err)
 		}
 
 		for msg := range progress {
+			log.Print(7)
 			log.Printf("%+v", msg)
 		}
 
+		log.Print(8)
 		file, err := os.Open(outputFilePath)
 		if err != nil {
 			log.Fatal(err)
