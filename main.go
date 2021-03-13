@@ -139,7 +139,6 @@ func main() {
 
 		progress, err := ffmpeg.
 			New(ffmpegConf).
-			InputPipe().
 			Input(inputFilePath).
 			Output(outputFilePath).
 			WithOptions(opts).
