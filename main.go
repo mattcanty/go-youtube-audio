@@ -29,8 +29,6 @@ type AdaptiveFormat struct {
 	URL           string      `json:"url"`
 }
 
-type StrInt int
-
 func main() {
 	r := chi.NewRouter()
 	r.Use(middleware.Logger)
@@ -85,6 +83,6 @@ func main() {
 
 		err = t.ExecuteTemplate(w, "T", selectedFormat.URL)
 	})
-	http.ListenAndServe(os.Getenv("PORT"), r)
 
+	http.ListenAndServe(fmt.Sprintf(":%s", os.Getenv("PORT")), r)
 }
