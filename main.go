@@ -82,7 +82,7 @@ func main() {
 			}
 		}
 
-		t, err := template.New("foo").Parse(`{{define "T"}}<h2>{{.Title}}</h2><br /><audio width="100%" src="{{.URL}}" controls></audio>{{end}}`)
+		t, err := template.New("foo").Parse(`{{define "T"}}<head><title>{{.Title}}</title></head><h2>{{.Title}}</h2><br /><audio width="100%" src="{{.URL}}" controls></audio>{{end}}`)
 
 		err = t.ExecuteTemplate(w, "T", struct {
 			Title, URL string
