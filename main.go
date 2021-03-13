@@ -21,6 +21,7 @@ import (
 	ffmpeg "github.com/floostack/transcoder/ffmpeg"
 )
 
+// PlayerResponse contains all the details we need to get audio
 type PlayerResponse struct {
 	StreamingData StreamingData `json:"streamingData"`
 	VideoDetails  VideoDetails  `json:"videoDetails"`
@@ -131,8 +132,8 @@ func main() {
 		}
 
 		ffmpegConf := &ffmpeg.Config{
-			FfmpegBinPath:   "/usr/local/bin/ffmpeg",
-			FfprobeBinPath:  "/usr/local/bin/ffprobe",
+			FfmpegBinPath:   "ffmpeg",
+			FfprobeBinPath:  "ffprobe",
 			ProgressEnabled: true,
 		}
 
