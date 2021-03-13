@@ -115,8 +115,8 @@ func main() {
 		urlHash := fnv.New32a()
 		urlHash.Write([]byte(url))
 
-		inputFilePath := fmt.Sprintf("./%d.webm", urlHash.Sum32())
-		outputFilePath := fmt.Sprintf("./%d.mp3", urlHash.Sum32())
+		inputFilePath := fmt.Sprintf("/tmp/%d.webm", urlHash.Sum32())
+		outputFilePath := fmt.Sprintf("/tmp/%d.mp3", urlHash.Sum32())
 
 		fmt.Printf("Downloading %s...\n", url)
 		_, err = grab.Get(inputFilePath, url)
@@ -139,6 +139,7 @@ func main() {
 
 		progress, err := ffmpeg.
 			New(ffmpegConf).
+			InputPipe().
 			Input(inputFilePath).
 			Output(outputFilePath).
 			WithOptions(opts).
