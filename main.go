@@ -1,8 +1,10 @@
 package main
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
+	"hash/fnv"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -13,6 +15,10 @@ import (
 
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
+
+	"github.com/cavaliercoder/grab"
+
+	ffmpeg "github.com/floostack/transcoder/ffmpeg"
 )
 
 type PlayerResponse struct {
@@ -82,14 +88,82 @@ func main() {
 			}
 		}
 
-		t, err := template.New("foo").Parse(`{{define "T"}}<head><title>{{.Title}}</title></head><h2>{{.Title}}</h2><br /><audio width="100%" src="{{.URL}}" controls></audio>{{end}}`)
+		t, err := template.ParseFiles("index.html")
+		if err != nil {
+			log.Fatal(err)
+		}
 
-		err = t.ExecuteTemplate(w, "T", struct {
-			Title, URL string
+		var b bytes.Buffer
+		err = t.Execute(&b, struct {
+			Title, URL, EscapedURL string
 		}{
-			Title: playerResponse.VideoDetails.Title,
-			URL:   selectedFormat.URL,
+			Title:      playerResponse.VideoDetails.Title,
+			URL:        selectedFormat.URL,
+			EscapedURL: url.QueryEscape(selectedFormat.URL),
 		})
+
+		w.Header().Add("Content-Type", "text/html")
+		fmt.Fprint(w, b.String())
+	})
+
+	r.Get("/mp3/{videoURL}", func(w http.ResponseWriter, r *http.Request) {
+		url, err := url.QueryUnescape(chi.URLParam(r, "videoURL"))
+		if err != nil {
+			log.Fatal(err)
+		}
+		urlHash := fnv.New32a()
+		urlHash.Write([]byte(url))
+
+		inputFilePath := fmt.Sprintf("./%d.webm", urlHash.Sum32())
+		outputFilePath := fmt.Sprintf("./%d.mp3", urlHash.Sum32())
+
+		fmt.Printf("Downloading %s...\n", url)
+		_, err = grab.Get(inputFilePath, url)
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		format := "mp3"
+		overwrite := true
+		opts := ffmpeg.Options{
+			OutputFormat: &format,
+			Overwrite:    &overwrite,
+		}
+
+		ffmpegConf := &ffmpeg.Config{
+			FfmpegBinPath:   "/usr/local/bin/ffmpeg",
+			FfprobeBinPath:  "/usr/local/bin/ffprobe",
+			ProgressEnabled: true,
+		}
+
+		progress, err := ffmpeg.
+			New(ffmpegConf).
+			Input(inputFilePath).
+			Output(outputFilePath).
+			WithOptions(opts).
+			Start(opts)
+
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		for msg := range progress {
+			log.Printf("%+v", msg)
+		}
+
+		file, err := os.Open(outputFilePath)
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		data, err := ioutil.ReadAll(file)
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		w.Header().Set("Content-Type", "audio/mpeg")
+		w.Header().Set("Content-Disposition", "filename=audio.mp3")
+		w.Write(data)
 	})
 
 	http.ListenAndServe(fmt.Sprintf(":%s", os.Getenv("PORT")), r)
