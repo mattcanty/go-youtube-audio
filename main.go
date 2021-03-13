@@ -39,6 +39,7 @@ type AdaptiveFormat struct {
 	AudioQuality  string      `json:"audioQuality"`
 	ContentLength json.Number `json:"contentLength"`
 	URL           string      `json:"url"`
+	MimeType      string      `json:"mimeType"`
 }
 
 func main() {
@@ -80,7 +81,11 @@ func main() {
 		lowestContentLength := 0
 
 		var selectedFormat AdaptiveFormat
+		var mp4Format AdaptiveFormat
 		for _, format := range playerResponse.StreamingData.AdaptiveFormats {
+			if strings.Contains(format.MimeType, "audio/mp4") {
+				mp4Format = format
+			}
 			if format.AudioQuality != "AUDIO_QUALITY_LOW" {
 				continue
 			}
@@ -96,11 +101,13 @@ func main() {
 
 		var b bytes.Buffer
 		err = t.Execute(&b, struct {
-			Title, URL, EscapedURL string
+			Title, URL, EscapedURL, Mp4URL, EscapedMp4URL string
 		}{
-			Title:      playerResponse.VideoDetails.Title,
-			URL:        selectedFormat.URL,
-			EscapedURL: url.QueryEscape(selectedFormat.URL),
+			Title:         playerResponse.VideoDetails.Title,
+			URL:           selectedFormat.URL,
+			EscapedURL:    url.QueryEscape(selectedFormat.URL),
+			Mp4URL:        mp4Format.URL,
+			EscapedMp4URL: url.QueryEscape(mp4Format.URL),
 		})
 
 		w.Header().Add("Content-Type", "text/html")
