@@ -10,7 +10,7 @@
 <body>
     {{range .VideoMetadataItems}}
     <h2>{{.Title}}</h2>
-    <audio width="100%" src="{{.URL}}" controls></audio>
+    <audio width="100%" src="{{.Mp4URL}}" controls></audio>
     <a href="{{.Mp4URL}}" download="youtube-audio.mp4">Download MP4</a> (this may be very slow for larger videos!)
     {{end}}
 </body>
