@@ -2,9 +2,9 @@ package main
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"fmt"
-	"hash/fnv"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -12,13 +12,13 @@ import (
 	"os"
 	"strings"
 	"text/template"
+	"time"
 
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
-
-	"github.com/cavaliercoder/grab"
-
-	ffmpeg "github.com/floostack/transcoder/ffmpeg"
+	"github.com/patrickmn/go-cache"
+	"google.golang.org/api/option"
+	"google.golang.org/api/youtube/v3"
 )
 
 // PlayerResponse contains all the details we need to get audio
@@ -42,7 +42,18 @@ type AdaptiveFormat struct {
 	MimeType      string      `json:"mimeType"`
 }
 
+type ViewData struct {
+	Error              error
+	VideoMetadataItems []VideoMetadata
+}
+
+type VideoMetadata struct {
+	Title, URL, EscapedURL, Mp4URL, EscapedMp4URL string
+}
+
 func main() {
+	c := cache.New(24*time.Hour, time.Hour)
+
 	r := chi.NewRouter()
 	r.Use(middleware.Logger)
 	r.Use(middleware.SetHeader("Content-Type", "text/html"))
@@ -50,134 +61,172 @@ func main() {
 	r.Get("/{videoID}", func(w http.ResponseWriter, r *http.Request) {
 		videoID := chi.URLParam(r, "videoID")
 
-		var client http.Client
-		resp, err := client.Get("https://www.youtube.com/get_video_info?video_id=" + videoID)
-		if err != nil {
-			log.Fatal(err)
-		}
-		defer resp.Body.Close()
-
-		bodyBytes, err := ioutil.ReadAll(resp.Body)
-		if err != nil {
-			log.Fatal(err)
-		}
-		bodyString := string(bodyBytes)
-
-		kvStrings := strings.Split(bodyString, "&")
-
-		var kvStringMap = make(map[string]string)
-		for _, kvString := range kvStrings {
-			tmpString := strings.SplitN(kvString, "=", 2)
-			kvStringMap[tmpString[0]] = tmpString[1]
-		}
-
-		playerResponseJSON, err := url.QueryUnescape(kvStringMap["player_response"])
-		if err != nil {
-			log.Fatal(err)
-		}
-
-		var playerResponse PlayerResponse
-		json.Unmarshal([]byte(playerResponseJSON), &playerResponse)
-		lowestContentLength := 0
-
-		var selectedFormat AdaptiveFormat
-		var mp4Format AdaptiveFormat
-		for _, format := range playerResponse.StreamingData.AdaptiveFormats {
-			if strings.Contains(format.MimeType, "audio/mp4") {
-				mp4Format = format
-			}
-			if format.AudioQuality != "AUDIO_QUALITY_LOW" {
-				continue
-			}
-			if lowestContentLength == 0 || selectedFormat.ContentLength > format.ContentLength {
-				selectedFormat = format
-			}
-		}
-
 		t, err := template.ParseFiles("index.html")
-		if err != nil {
-			log.Fatal(err)
-		}
+		handleError(err)
 
 		var b bytes.Buffer
-		err = t.Execute(&b, struct {
-			Title, URL, EscapedURL, Mp4URL, EscapedMp4URL string
-		}{
-			Title:         playerResponse.VideoDetails.Title,
-			URL:           selectedFormat.URL,
-			EscapedURL:    url.QueryEscape(selectedFormat.URL),
-			Mp4URL:        mp4Format.URL,
-			EscapedMp4URL: url.QueryEscape(mp4Format.URL),
-		})
+		err = t.Execute(&b, getVideoMetadata(videoID))
 
 		w.Header().Add("Content-Type", "text/html")
 		fmt.Fprint(w, b.String())
 	})
 
-	r.Get("/mp3/{videoURL}", func(w http.ResponseWriter, r *http.Request) {
-		log.Print(1)
-		url, err := url.QueryUnescape(chi.URLParam(r, "videoURL"))
-		if err != nil {
-			log.Fatal(err)
-		}
-		log.Print(2)
-		urlHash := fnv.New32a()
-		urlHash.Write([]byte(url))
-		log.Print(3)
-		inputFilePath := fmt.Sprintf("/tmp/%d.webm", urlHash.Sum32())
-		outputFilePath := fmt.Sprintf("/tmp/%d.mp3", urlHash.Sum32())
-		log.Print(4)
-		log.Printf("Downloading %s...\n", url)
-		_, err = grab.Get(inputFilePath, url)
-		if err != nil {
-			log.Fatal(err)
-		}
-		log.Print(5)
+	r.Get("/channel/{channelID}", func(w http.ResponseWriter, r *http.Request) {
+		channelID := chi.URLParam(r, "channelID")
+		viewDataCacheKey := fmt.Sprintf("%s-viewdata", channelID)
 
-		format := "mp3"
-		overwrite := true
-		opts := ffmpeg.Options{
-			OutputFormat: &format,
-			Overwrite:    &overwrite,
-		}
+		if x, found := c.Get(viewDataCacheKey); found {
+			viewData := (**x.(**ViewData))
 
-		ffmpegConf := &ffmpeg.Config{
-			FfmpegBinPath:   "ffmpeg",
-			FfprobeBinPath:  "ffprobe",
-			ProgressEnabled: true,
-		}
+			t, err := template.ParseFiles("channel.html")
+			handleError(err)
 
-		progress, err := ffmpeg.
-			New(ffmpegConf).
-			Input(inputFilePath).
-			Output(outputFilePath).
-			WithOptions(opts).
-			Start(opts)
-		log.Print(6)
-		if err != nil {
-			log.Fatal(err)
-		}
+			var b bytes.Buffer
+			err = t.Execute(&b, &viewData)
 
-		for msg := range progress {
-			log.Print(7)
-			log.Printf("%+v", msg)
-		}
+			w.Header().Add("Content-Type", "text/html")
+			fmt.Fprint(w, b.String())
+		} else {
 
-		log.Print(8)
-		file, err := os.Open(outputFilePath)
-		if err != nil {
-			log.Fatal(err)
-		}
+			ctx := context.Background()
 
-		data, err := ioutil.ReadAll(file)
-		if err != nil {
-			log.Fatal(err)
-		}
+			youtubeService, err := youtube.NewService(ctx, option.WithAPIKey(os.Getenv("GOOGLE_API_KEY")))
+			handleError(err)
 
-		w.Header().Set("Content-Type", "audio/mpeg")
-		w.Header().Set("Content-Disposition", "filename=audio.mp3")
-		w.Write(data)
+			videoList := youtubeService.Videos.List([]string{"snippet"})
+
+			searchList := youtubeService.Search.List([]string{"id"})
+			searchList.ChannelId(channelID)
+			searchList.Order("date")
+			searchList.Type("video")
+			searchList.MaxResults(50)
+			searchList.PublishedAfter("1970-01-01T00:00:00Z")
+			searchResponse, err := searchList.Do()
+			handleError(err)
+
+			totalResults := searchResponse.PageInfo.TotalResults
+			fmt.Printf("Total Results: %d\n", totalResults)
+
+			var items []*youtube.SearchResult
+
+			items = append(items, searchResponse.Items...)
+
+			fmt.Println(items)
+
+			for {
+				fmt.Println("Getting more results")
+				lastVideoID := items[len(items)-1].Id.VideoId
+
+				fmt.Printf("Last video ID: %s\n", lastVideoID)
+				videoList.Id(lastVideoID)
+				videoListResponse, err := videoList.Do()
+				handleError(err)
+
+				lastVideo := videoListResponse.Items[0]
+
+				fmt.Printf("Video - %s Title: %s \n", lastVideo.Snippet.PublishedAt, lastVideo.Snippet.Title)
+				searchList.PublishedBefore(lastVideo.Snippet.PublishedAt)
+
+				searchResponse2, err := searchList.Do()
+				handleError(err)
+
+				items = append(items, searchResponse2.Items[1:]...)
+
+				fmt.Printf("Total Items: %d\n", len(items))
+
+				if len(searchResponse2.Items[1:]) == 0 {
+					break
+				}
+			}
+
+			var viewData = &ViewData{}
+			for _, item := range items {
+				cacheKey := fmt.Sprintf("%s-videometa", item.Id.VideoId)
+
+				if x, found := c.Get(cacheKey); found {
+					videoMetadata := x.(*VideoMetadata)
+					viewData.VideoMetadataItems = append(
+						viewData.VideoMetadataItems,
+						*videoMetadata,
+					)
+				} else {
+					videoMetadata := getVideoMetadata(item.Id.VideoId)
+					c.Set(cacheKey, &videoMetadata, cache.DefaultExpiration)
+					viewData.VideoMetadataItems = append(
+						viewData.VideoMetadataItems,
+						videoMetadata,
+					)
+				}
+			}
+
+			c.Set(viewDataCacheKey, &viewData, cache.DefaultExpiration)
+
+			t, err := template.ParseFiles("channel.html")
+			handleError(err)
+
+			var b bytes.Buffer
+			err = t.Execute(&b, viewData)
+
+			w.Header().Add("Content-Type", "text/html")
+			fmt.Fprint(w, b.String())
+		}
 	})
 
 	http.ListenAndServe(fmt.Sprintf(":%s", os.Getenv("PORT")), r)
+}
+
+func handleError(err error) {
+	if err != nil {
+		log.Fatal(err)
+	}
+}
+
+func getVideoMetadata(videoID string) VideoMetadata {
+	var client http.Client
+	resp, err := client.Get("https://www.youtube.com/get_video_info?video_id=" + videoID)
+	handleError(err)
+	defer resp.Body.Close()
+
+	bodyBytes, err := ioutil.ReadAll(resp.Body)
+	handleError(err)
+	bodyString := string(bodyBytes)
+
+	kvStrings := strings.Split(bodyString, "&")
+
+	var kvStringMap = make(map[string]string)
+	for _, kvString := range kvStrings {
+		tmpString := strings.SplitN(kvString, "=", 2)
+		kvStringMap[tmpString[0]] = tmpString[1]
+	}
+
+	playerResponseJSON, err := url.QueryUnescape(kvStringMap["player_response"])
+	handleError(err)
+
+	var playerResponse PlayerResponse
+	json.Unmarshal([]byte(playerResponseJSON), &playerResponse)
+	lowestContentLength := 0
+
+	var selectedFormat AdaptiveFormat
+	var mp4Format AdaptiveFormat
+	for _, format := range playerResponse.StreamingData.AdaptiveFormats {
+		if strings.Contains(format.MimeType, "audio/mp4") {
+			mp4Format = format
+		}
+		if format.AudioQuality != "AUDIO_QUALITY_LOW" {
+			continue
+		}
+		if lowestContentLength == 0 || selectedFormat.ContentLength > format.ContentLength {
+			selectedFormat = format
+		}
+	}
+
+	meta := &VideoMetadata{
+		Title:         playerResponse.VideoDetails.Title,
+		URL:           selectedFormat.URL,
+		EscapedURL:    url.QueryEscape(selectedFormat.URL),
+		Mp4URL:        mp4Format.URL,
+		EscapedMp4URL: url.QueryEscape(mp4Format.URL),
+	}
+
+	return *meta
 }
