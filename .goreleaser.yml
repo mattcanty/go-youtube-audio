@@ -1,13 +1,22 @@
 before:
   hooks:
 builds:
-  - main: ./cmd/cli
+  - id: windows
+    main: ./cmd/cli
+    env:
+      - CGO_ENABLED=0
+    goos:
+      - windows
+  - id: notwindows
+    main: ./cmd/cli
     env:
       - CGO_ENABLED=0
     goos:
       - linux
       - darwin
-      - windows
+archives:
+  - id: windows
+    format: zip
 checksum:
   name_template: "checksums.txt"
 snapshot:
