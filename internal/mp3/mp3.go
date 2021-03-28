@@ -41,7 +41,14 @@ func Download(videoID string, outputDirectory string) error {
 	mp3Path := path.Join(os.TempDir(), mp3FileName)
 
 	webmFile, err := os.Create(webmPath)
+	if err != nil {
+		return err
+	}
+
 	mp3File, err := os.Create(mp3Path)
+	if err != nil {
+		return err
+	}
 
 	err = youtube.DownloadAudio(selectedFormat.URL, webmFile)
 	if err != nil {
