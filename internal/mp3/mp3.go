@@ -5,15 +5,12 @@ import (
 	"os"
 	"path"
 	"path/filepath"
-	"runtime"
 	"strings"
 
 	"github.com/kennygrant/sanitize"
 	"github.com/matt.canty/go-youtube-audio/internal/logger"
 	"github.com/matt.canty/go-youtube-audio/internal/youtube"
 	"github.com/matt.canty/go-youtube-audio/pkg/models"
-	"github.com/xfrr/goffmpeg/ffmpeg"
-	"github.com/xfrr/goffmpeg/transcoder"
 )
 
 func Download(videoID string, outputDirectory string) error {
@@ -70,31 +67,18 @@ func Download(videoID string, outputDirectory string) error {
 		return err
 	}
 
-	logger.Debug(fmt.Sprintf("Writing audio to: '%s'", mp3Path))
+	logger.Debug(fmt.Sprintf("Transcoding audio to: '%s'", mp3Path))
 
-	trans := new(transcoder.Transcoder)
-
-	if runtime.GOOS == "windows" {
-		conf, _ := ffmpeg.Configure()
-		conf.FfprobeBin = strings.Trim(conf.FfprobeBin, "\\r")
-		trans.SetConfiguration(conf)
-	}
-
-	err = trans.Initialize(webmFile.Name(), mp3File.Name())
+	err = transcode(webmFile.Name(), mp3File.Name())
 	if err != nil {
 		return err
 	}
 
-	done := trans.Run(true)
-
-	err = <-done
-
+	logger.Debug(fmt.Sprintf("Deleting: '%s'", webmPath))
 	os.Remove(webmPath)
+
+	logger.Debug(fmt.Sprintf("Moving MP3 to output directory: '%s'", webmPath))
 	os.Rename(mp3Path, filepath.FromSlash(path.Join(outputDirectory, mp3FileName)))
 
 	return err
-}
-
-func transcode() {
-
 }
