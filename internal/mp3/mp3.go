@@ -7,6 +7,7 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/kennygrant/sanitize"
 	"github.com/matt.canty/go-youtube-audio/internal/logger"
 	"github.com/matt.canty/go-youtube-audio/internal/youtube"
 	"github.com/matt.canty/go-youtube-audio/pkg/models"
@@ -35,8 +36,10 @@ func Download(videoID string, outputDirectory string) error {
 		break
 	}
 
-	webmFileName := fmt.Sprintf("%s.webm", info.PlayerResponse.VideoDetails.Title)
-	mp3FileName := fmt.Sprintf("%s.mp3", info.PlayerResponse.VideoDetails.Title)
+	santitisedTitle := sanitize.Path(info.PlayerResponse.VideoDetails.Title)
+
+	webmFileName := fmt.Sprintf("%s.webm", santitisedTitle)
+	mp3FileName := fmt.Sprintf("%s.mp3", santitisedTitle)
 
 	webmPath := filepath.FromSlash(path.Join(os.TempDir(), webmFileName))
 	mp3Path := filepath.FromSlash(path.Join(os.TempDir(), mp3FileName))

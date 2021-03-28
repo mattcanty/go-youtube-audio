@@ -4,8 +4,10 @@ go 1.16
 
 require (
 	github.com/denisbrodbeck/machineid v1.0.1
+	github.com/kennygrant/sanitize v1.2.4 // indirect
 	github.com/sirupsen/logrus v1.8.1
 	github.com/stretchr/testify v1.6.1 // indirect
 	github.com/xfrr/goffmpeg v0.0.0-20200825100927-5550d238df5c
+	golang.org/x/net v0.0.0-20210326220855-61e056675ecf // indirect
 	golang.org/x/sys v0.0.0-20210324051608-47abb6519492 // indirect
 )
