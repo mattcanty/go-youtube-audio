@@ -76,7 +76,7 @@ func Download(videoID string, outputDirectory string) error {
 
 	if runtime.GOOS == "windows" {
 		conf, _ := ffmpeg.Configure()
-		conf.FfprobeBin = strings.Trim(conf.FfprobeBin, "\r")
+		conf.FfprobeBin = strings.Trim(conf.FfprobeBin, "\\r")
 		trans.SetConfiguration(conf)
 	}
 
