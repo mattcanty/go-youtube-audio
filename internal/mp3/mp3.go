@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"path"
+	"path/filepath"
 	"strings"
 
 	"github.com/matt.canty/go-youtube-audio/internal/logger"
@@ -37,8 +38,8 @@ func Download(videoID string, outputDirectory string) error {
 	webmFileName := fmt.Sprintf("%s.webm", info.PlayerResponse.VideoDetails.Title)
 	mp3FileName := fmt.Sprintf("%s.mp3", info.PlayerResponse.VideoDetails.Title)
 
-	webmPath := path.Join(os.TempDir(), webmFileName)
-	mp3Path := path.Join(os.TempDir(), mp3FileName)
+	webmPath := filepath.FromSlash(path.Join(os.TempDir(), webmFileName))
+	mp3Path := filepath.FromSlash(path.Join(os.TempDir(), mp3FileName))
 
 	webmFile, err := os.Create(webmPath)
 	if err != nil {
@@ -68,7 +69,7 @@ func Download(videoID string, outputDirectory string) error {
 	err = <-done
 
 	os.Remove(webmPath)
-	os.Rename(mp3Path, path.Join(outputDirectory, mp3FileName))
+	os.Rename(mp3Path, filepath.FromSlash(path.Join(outputDirectory, mp3FileName)))
 
 	return err
 }
