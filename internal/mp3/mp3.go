@@ -6,8 +6,9 @@ import (
 	"path"
 	"strings"
 
+	"github.com/matt.canty/go-youtube-audio/internal/logger"
+	"github.com/matt.canty/go-youtube-audio/internal/youtube"
 	"github.com/matt.canty/go-youtube-audio/pkg/models"
-	"github.com/matt.canty/go-youtube-audio/pkg/youtube"
 	"github.com/xfrr/goffmpeg/transcoder"
 )
 
@@ -27,6 +28,8 @@ func Download(videoID string, outputDirectory string) error {
 			continue
 		}
 
+		logger.Debug(fmt.Sprintf("Selected '%s' %s ", format.MimeType, format.AudioQuality))
+
 		selectedFormat = format
 		break
 	}
@@ -44,6 +47,8 @@ func Download(videoID string, outputDirectory string) error {
 	if err != nil {
 		return err
 	}
+
+	logger.Debug(fmt.Sprintf("Writing audio to: '%s'", webmPath))
 
 	trans := new(transcoder.Transcoder)
 	err = trans.Initialize(webmFile.Name(), mp3File.Name())

@@ -7,12 +7,16 @@ import (
 	"net/http"
 	"os"
 
+	"github.com/matt.canty/go-youtube-audio/internal/logger"
 	"github.com/matt.canty/go-youtube-audio/pkg/models"
 )
 
 func GetVideoInfo(videoID string) (*models.VideoInfo, error) {
+	videoInfoURL := fmt.Sprintf("https://www.youtube.com/get_video_info?video_id=%s", videoID)
+	logger.Debug(fmt.Sprintf("Getting video info from URL: '%s'", videoInfoURL))
+
 	var client http.Client
-	resp, err := client.Get("https://www.youtube.com/get_video_info?video_id=" + videoID)
+	resp, err := client.Get(videoInfoURL)
 	if err != nil {
 		return nil, err
 	}
@@ -34,6 +38,7 @@ func GetVideoInfo(videoID string) (*models.VideoInfo, error) {
 }
 
 func DownloadAudio(audioURL string, file *os.File) error {
+	logger.Debug(fmt.Sprintf("Downloading audio from URL: '%s' to file: '%s'", audioURL, file.Name()))
 	client := &http.Client{}
 	request, err := http.NewRequest("GET", audioURL, nil)
 	if err != nil {
@@ -56,6 +61,7 @@ func DownloadAudio(audioURL string, file *os.File) error {
 		return fmt.Errorf("%s: %s", http.StatusText(response.StatusCode), response.Status)
 	}
 
+	logger.Debug(fmt.Sprintf("Writing audio to: '%s'", file.Name()))
 	_, err = io.Copy(file, response.Body)
 
 	return nil
