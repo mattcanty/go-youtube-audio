@@ -19,7 +19,7 @@ func transcode(webmFileName string, mp3FileName string) error {
 		conf, _ := ffmpeg.Configure()
 
 		ffprobeBin := strings.SplitAfterN(conf.FfprobeBin, "ffprobe.exe", 2)[0]
-		ffmpegBin := strings.SplitAfterN(conf.FfprobeBin, "ffmpeg.exe", 2)[0]
+		ffmpegBin := strings.SplitAfterN(conf.FfmpegBin, "ffmpeg.exe", 2)[0]
 
 		logger.Debug(fmt.Sprintf("ffprobe bin path fixed to %s", ffprobeBin))
 		logger.Debug(fmt.Sprintf("ffmpeg bin path fixed to %s", ffmpegBin))
