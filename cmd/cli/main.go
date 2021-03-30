@@ -4,8 +4,8 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/matt.canty/go-youtube-audio/internal/logger"
-	"github.com/matt.canty/go-youtube-audio/internal/mp3"
+	"github.com/mattcanty/go-youtube-audio/internal/logger"
+	"github.com/mattcanty/go-youtube-audio/internal/mp3"
 )
 
 func main() {

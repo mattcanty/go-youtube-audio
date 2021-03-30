@@ -8,9 +8,9 @@ import (
 	"strings"
 
 	"github.com/kennygrant/sanitize"
-	"github.com/matt.canty/go-youtube-audio/internal/logger"
-	"github.com/matt.canty/go-youtube-audio/internal/youtube"
-	"github.com/matt.canty/go-youtube-audio/pkg/models"
+	"github.com/mattcanty/go-youtube-audio/internal/logger"
+	"github.com/mattcanty/go-youtube-audio/internal/youtube"
+	"github.com/mattcanty/go-youtube-audio/pkg/models"
 )
 
 func Download(videoID string, outputDirectory string) error {

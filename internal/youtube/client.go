@@ -7,8 +7,8 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/matt.canty/go-youtube-audio/internal/logger"
-	"github.com/matt.canty/go-youtube-audio/pkg/models"
+	"github.com/mattcanty/go-youtube-audio/internal/logger"
+	"github.com/mattcanty/go-youtube-audio/pkg/models"
 	"github.com/schollz/progressbar/v3"
 )
 
