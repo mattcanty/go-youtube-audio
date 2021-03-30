@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	"github.com/kennygrant/sanitize"
+	"github.com/mattcanty/go-ffmpeg-transcode/pkg/ffmpeg"
 	"github.com/mattcanty/go-youtube-audio/internal/logger"
 	"github.com/mattcanty/go-youtube-audio/internal/youtube"
 	"github.com/mattcanty/go-youtube-audio/pkg/models"
@@ -48,11 +49,6 @@ func Download(videoID string, outputDirectory string) error {
 		return err
 	}
 
-	mp3File, err := os.Create(mp3Path)
-	if err != nil {
-		return err
-	}
-
 	expectedContentLength, err := selectedFormat.ContentLength.Int64()
 	if err != nil {
 		return err
@@ -69,7 +65,7 @@ func Download(videoID string, outputDirectory string) error {
 
 	logger.Debug(fmt.Sprintf("Transcoding audio to: '%s'", mp3Path))
 
-	err = transcode(webmFile.Name(), mp3File.Name())
+	err = ffmpeg.Transcode(webmFileName, mp3FileName)
 	if err != nil {
 		return err
 	}
