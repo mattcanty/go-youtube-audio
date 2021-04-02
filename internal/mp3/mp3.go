@@ -65,7 +65,7 @@ func Download(videoID string, outputDirectory string) error {
 
 	logger.Debug(fmt.Sprintf("Transcoding audio to: '%s'", mp3Path))
 
-	err = ffmpeg.Transcode(webmFileName, mp3FileName)
+	err = ffmpeg.Transcode(webmPath, mp3Path)
 	if err != nil {
 		return err
 	}
