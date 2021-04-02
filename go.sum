@@ -23,6 +23,8 @@ github.com/mattcanty/go-ffmpeg-transcode v0.0.0-20210402160926-3d4bfb75eda8 h1:w
 github.com/mattcanty/go-ffmpeg-transcode v0.0.0-20210402160926-3d4bfb75eda8/go.mod h1:6FsEA/vNPapmy85OaaL2sfROMpoeWsVV5SafDxUroyA=
 github.com/mattcanty/go-ffmpeg-transcode v0.0.0-20210402162948-c530b9171a0d h1:2GqhrpjaBA/k2FpD7ZNego/9LFeQcnOm5bvm2MiAayI=
 github.com/mattcanty/go-ffmpeg-transcode v0.0.0-20210402162948-c530b9171a0d/go.mod h1:6FsEA/vNPapmy85OaaL2sfROMpoeWsVV5SafDxUroyA=
+github.com/mattcanty/go-ffmpeg-transcode v0.0.0-20210402170326-6c3660c1d224 h1:VoYz7Rz3NJZ9Kop1n94tcUgPWU3QK2ZpLbdlC0A/aNQ=
+github.com/mattcanty/go-ffmpeg-transcode v0.0.0-20210402170326-6c3660c1d224/go.mod h1:6FsEA/vNPapmy85OaaL2sfROMpoeWsVV5SafDxUroyA=
 github.com/mattn/go-isatty v0.0.12/go.mod h1:cbi8OIDigv2wuxKPP5vlRcQ1OAZbq2CE4Kysco4FUpU=
 github.com/mattn/go-runewidth v0.0.10 h1:CoZ3S2P7pvtP45xOtBw+/mDL2z0RKI576gSkzRRpdGg=
 github.com/mattn/go-runewidth v0.0.10/go.mod h1:RAqKPSqVFrSLVXbA8x7dzmKdmGzieGRCM46jaSJTDAk=

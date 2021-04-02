@@ -7,7 +7,7 @@ require (
 	github.com/denisbrodbeck/machineid v1.0.1
 	github.com/kennygrant/sanitize v1.2.4 // indirect
 	github.com/kyslik/geroz v0.0.0-20200913120024-ac2279444b55 // indirect
-	github.com/mattcanty/go-ffmpeg-transcode v0.0.0-20210402162948-c530b9171a0d // indirect
+	github.com/mattcanty/go-ffmpeg-transcode v0.0.0-20210402170326-6c3660c1d224 // indirect
 	github.com/schollz/progressbar/v3 v3.7.6 // indirect
 	github.com/sirupsen/logrus v1.8.1
 	github.com/stretchr/testify v1.6.1 // indirect
