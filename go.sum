@@ -8,8 +8,6 @@ github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/denisbrodbeck/machineid v1.0.1 h1:geKr9qtkB876mXguW2X6TU4ZynleN6ezuMSRhl4D7AQ=
 github.com/denisbrodbeck/machineid v1.0.1/go.mod h1:dJUwb7PTidGDeYyUBmXZ2GphQBbjJCrnectwCyxcUSI=
-github.com/j-friedman/goffmpeg v0.0.0-20210127145912-037cb297e826 h1:+VRJh4g/RwcBw6zXhhQLEjy6Y76FAxu2Hk2tfh7okuo=
-github.com/j-friedman/goffmpeg v0.0.0-20210127145912-037cb297e826/go.mod h1:aQ9dIALPe9ryIFJauk9BK4AKNSTJQa+juYhHeclQW6c=
 github.com/k0kubun/go-ansi v0.0.0-20180517002512-3bf9e2903213/go.mod h1:vNUNkEQ1e29fT/6vq2aBdFsgNPmy8qMdSay1npru+Sw=
 github.com/kennygrant/sanitize v1.2.4 h1:gN25/otpP5vAsO2djbMhF/LQX6R7+O1TB4yv8NzpJ3o=
 github.com/kennygrant/sanitize v1.2.4/go.mod h1:LGsjYYtgxbetdg5owWB2mpgUL6e2nfw2eObZ0u0qvak=
@@ -17,6 +15,12 @@ github.com/kyslik/geroz v0.0.0-20200913120024-ac2279444b55 h1:QLbnKFOQPJ0sZpZw1M
 github.com/kyslik/geroz v0.0.0-20200913120024-ac2279444b55/go.mod h1:XT+72CPhn+AKB7s0uuJYLTsaI5ODA2jB1kiVzTntqsA=
 github.com/mattcanty/go-ffmpeg-transcode v0.0.0-20210328195850-4852f3cfd0c6 h1:W38ImaVZaxtOiUXfDHFJNqFAGFxDJkUoHv06Gb/W7Ac=
 github.com/mattcanty/go-ffmpeg-transcode v0.0.0-20210328195850-4852f3cfd0c6/go.mod h1:6FsEA/vNPapmy85OaaL2sfROMpoeWsVV5SafDxUroyA=
+github.com/mattcanty/go-ffmpeg-transcode v0.0.0-20210402155336-fb8f42a1c30c h1:gY/UE8QxCGqKv68/AaWCC4nZeIjgSF2ysqWvDgfMhHk=
+github.com/mattcanty/go-ffmpeg-transcode v0.0.0-20210402155336-fb8f42a1c30c/go.mod h1:6FsEA/vNPapmy85OaaL2sfROMpoeWsVV5SafDxUroyA=
+github.com/mattcanty/go-ffmpeg-transcode v0.0.0-20210402160448-8b670d385722 h1:ykBQLjj4UmykdU/ZQGB2qhF60jMYy2mrcyaDsA5i8Wc=
+github.com/mattcanty/go-ffmpeg-transcode v0.0.0-20210402160448-8b670d385722/go.mod h1:6FsEA/vNPapmy85OaaL2sfROMpoeWsVV5SafDxUroyA=
+github.com/mattcanty/go-ffmpeg-transcode v0.0.0-20210402160926-3d4bfb75eda8 h1:wvc/wXR+DynTh+VYG4S6tGNGZhH2mILmFtirlY1RzaI=
+github.com/mattcanty/go-ffmpeg-transcode v0.0.0-20210402160926-3d4bfb75eda8/go.mod h1:6FsEA/vNPapmy85OaaL2sfROMpoeWsVV5SafDxUroyA=
 github.com/mattn/go-isatty v0.0.12/go.mod h1:cbi8OIDigv2wuxKPP5vlRcQ1OAZbq2CE4Kysco4FUpU=
 github.com/mattn/go-runewidth v0.0.10 h1:CoZ3S2P7pvtP45xOtBw+/mDL2z0RKI576gSkzRRpdGg=
 github.com/mattn/go-runewidth v0.0.10/go.mod h1:RAqKPSqVFrSLVXbA8x7dzmKdmGzieGRCM46jaSJTDAk=
@@ -39,8 +43,6 @@ github.com/stretchr/testify v1.3.0/go.mod h1:M5WIy9Dh21IEIfnGCwXGc5bZfKNJtfHm1UV
 github.com/stretchr/testify v1.5.1/go.mod h1:5W2xD1RspED5o8YsWQXVCued0rvSQ+mT+I5cxcmMvtA=
 github.com/stretchr/testify v1.6.1 h1:hDPOHmpOpP40lSULcqw7IrRb/u7w6RpDC9399XyoNd0=
 github.com/stretchr/testify v1.6.1/go.mod h1:6Fq8oRcR53rry900zMqJjRRixrwX3KX962/h/Wwjteg=
-github.com/xfrr/goffmpeg v0.0.0-20200825100927-5550d238df5c h1:ydcAlElffxxmOn982VmNsx56UM2Op2OetAPura00Bec=
-github.com/xfrr/goffmpeg v0.0.0-20200825100927-5550d238df5c/go.mod h1:fVs4qpwtgjOHD31cTmdHppcr/6vD8QHrAVAu2jTSVFI=
 golang.org/x/crypto v0.0.0-20190308221718-c2843e01d9a2/go.mod h1:djNgcEr1/C05ACkg1iLfiJU5Ep61QUkGW8qpdssI0+w=
 golang.org/x/crypto v0.0.0-20210220033148-5ea612d1eb83/go.mod h1:jdWPYTVW3xRLrWPugEBEK3UY2ZEsg3UU495nc5E+M+I=
 golang.org/x/crypto v0.0.0-20210322153248-0c34fe9e7dc2 h1:It14KIkyBFYkHkwZ7k45minvA9aorojkyjGk9KJ5B/w=
